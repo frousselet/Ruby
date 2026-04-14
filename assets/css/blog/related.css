@@ -5,10 +5,9 @@
     background-color: var(--light-gray-color);
 }
 
-.related-title {
-    margin: 20px 0 40px;
-    font-size: 14px;
-    color: var(--secondary-text-color);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+
+@media (prefers-color-scheme: dark) {
+    .related-wrapper {
+        background-color: #161616;
+    }
 }

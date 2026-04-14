@@ -1,6 +1,6 @@
 .u-shadow {
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 10px;
     box-shadow: var(--shadow-base);
     transition: box-shadow 0.3s var(--animation-base);
 }
@@ -40,4 +40,9 @@
     left: 0;
     z-index: 10;
     outline: none;
+}
+
+.gh-portal-triggerbtn-iframe {
+    visibility: hidden !important;
+    display: none !important;
 }

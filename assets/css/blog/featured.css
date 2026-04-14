@@ -1,6 +1,6 @@
 .post-feed .featured {
     position: relative;
-    min-height: 380px;
+    min-height: auto;
 }
 
 .post-feed .featured .post-link::before {
