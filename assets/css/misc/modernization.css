@@ -188,6 +188,20 @@
 
 
 
+/* ---------- 4-column grid on large screens (home only).
+   Keeps the ~378px cell size and widens the container. */
+
+@media (min-width: 1400px) {
+    .home-template .site-main.gh-inner {
+        max-width: 1608px;
+    }
+
+    .home-template .post-feed {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+
 /* ---------- 5a. Option C: image fills the card, text overlay with
    dark gradient from slightly-tinted (behind text) to fully transparent
    (bottom of card). White text with shadow for readability. */
@@ -229,18 +243,51 @@
 
 .post-feed > .post:not(.featured) .post-tag,
 .post-feed > .post:not(.featured) .post-year,
-.post-feed > .post:not(.featured) .post-title {
+.post-feed > .post:not(.featured) .post-title,
+.post-feed > .post:not(.featured) .post-excerpt {
     color: #fff !important;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 .post-feed > .post:not(.featured) .post-tag,
-.post-feed > .post:not(.featured) .post-year {
+.post-feed > .post:not(.featured) .post-year,
+.post-feed > .post:not(.featured) .post-excerpt {
     color: rgba(255, 255, 255, 0.85) !important;
 }
 
 .post-feed > .post:not(.featured) .post-tag + .post-year::before {
     color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Excerpt on home cards: single line truncated with ellipsis.
+   Collapsed by default; on hover the excerpt reveals from 0 height,
+   which (since .post-wrapper is bottom-anchored) pushes the title upward
+   to make room. */
+.post-feed .post-excerpt {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-wrap: nowrap;
+    max-height: 0;
+    opacity: 0;
+    transition:
+        max-height 0.35s var(--animation-base, ease),
+        margin-top 0.35s var(--animation-base, ease),
+        opacity 0.25s ease;
+}
+
+@media (hover: hover) {
+    .post-feed > .post:has(.post-link:hover) .post-excerpt {
+        max-height: 2em;
+        margin-top: 6px;
+        opacity: 1;
+    }
 }
 
 
@@ -326,7 +373,21 @@
 }
 
 @media (max-width: 766px) {
-    .gh-head {
+    /* Mobile header = floating Liquid Glass pill.
+       Pill position, glass material and inner layout apply in BOTH states
+       (menu closed and menu open) so the brand row — logo, search, burger —
+       stays anchored in the exact same spot when the menu opens. Only the
+       pill height changes: 48px closed, full viewport minus 12px margins open. */
+    #gh-head.gh-head {
+        position: fixed;
+        z-index: 9999;
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        min-height: 0;
+        border-radius: 24px;
+        box-sizing: border-box;
         background-color: light-dark(
             rgba(255, 255, 255, 0.55),
             rgba(25, 25, 28, 0.55)
@@ -338,6 +399,106 @@
             inset 0 -0.5px 0 light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.25)),
             0 0 0 0.5px light-dark(rgba(0, 0, 0, 0.06), rgba(255, 255, 255, 0.06)),
             0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    /* Closed: compact pill */
+    body:not(.is-head-open) #gh-head.gh-head {
+        height: 48px;
+    }
+
+    /* Open: pill stretches to cover the viewport, brand row stays in place */
+    .is-head-open #gh-head.gh-head {
+        bottom: 12px;
+        height: auto;
+    }
+
+    /* Slightly heavier glass for the expanded overlay */
+    .is-head-open:not(.is-head-brand):not(.is-head-dark):not(.is-head-transparent) #gh-head {
+        background-color: light-dark(
+            rgba(255, 255, 255, 0.72),
+            rgba(17, 17, 20, 0.78)
+        ) !important;
+        backdrop-filter: blur(40px) saturate(1.8) contrast(1.05) !important;
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) contrast(1.05) !important;
+    }
+
+    /* Push content below the floating header */
+    .site-content {
+        margin-top: 68px;
+    }
+
+    /* Inner layout — identical in both states so logo / search / burger
+       keep the exact same position when the menu toggles open. */
+    #gh-head .gh-head-inner {
+        height: 100%;
+        padding: 0 12px;
+    }
+
+    #gh-head .gh-head-brand {
+        display: flex;
+        align-items: center;
+        height: 48px;
+        padding: 0;
+        line-height: 1;
+    }
+
+    #gh-head .gh-head-brand-wrapper {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        flex: 1;
+        min-width: 0;
+    }
+
+    #gh-head .gh-head-logo {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        font-size: 1.6rem;
+        line-height: 1;
+        padding: 0;
+        margin: 0;
+    }
+
+    #gh-head .gh-head-logo img {
+        max-height: 28px;
+        display: block;
+    }
+
+    #gh-head .gh-burger,
+    #gh-head .gh-search {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        margin: 0;
+        padding: 0;
+        flex: 0 0 auto;
+        align-self: center;
+    }
+
+    #gh-head .gh-search svg {
+        width: 18px;
+        height: 18px;
+        display: block;
+    }
+
+    /* Burger bar centering — closed only, so upstream's X animation
+       keeps its own pivot points (top: 15px / bottom: 14px) when open. */
+    body:not(.is-head-open) #gh-head .gh-burger::before,
+    body:not(.is-head-open) #gh-head .gh-burger::after {
+        left: 50%;
+        width: 20px;
+        margin-left: -10px;
+    }
+
+    body:not(.is-head-open) #gh-head .gh-burger::before {
+        top: 12px;
+    }
+
+    body:not(.is-head-open) #gh-head .gh-burger::after {
+        bottom: 12px;
     }
 }
 
@@ -416,7 +577,7 @@ body::after {
 
 @container card (min-width: 380px) {
     .post-title {
-        font-size: 1.9rem;
+        font-size: 2.4rem;
     }
 
     .post-wrapper {
@@ -426,7 +587,7 @@ body::after {
 
 @container card (min-width: 520px) {
     .post-title {
-        font-size: 2.2rem;
+        font-size: 2.8rem;
     }
 }
 
@@ -473,7 +634,7 @@ body::after {
 }
 
 
-/* ---------- 11. Variable font optical sizing + kinetic heading */
+/* ---------- 11. Variable font optical sizing */
 
 html {
     font-optical-sizing: auto;
@@ -483,23 +644,4 @@ html {
 .post-title,
 .has-serif-title {
     font-synthesis: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .gh-article-title {
-        font-variation-settings: "wght" 800, "opsz" 96;
-        transition: font-variation-settings 0.5s var(--animation-base, ease);
-    }
-
-    .gh-article-title:hover {
-        font-variation-settings: "wght" 900, "opsz" 144;
-    }
-
-    .post-title {
-        transition: font-variation-settings 0.3s var(--animation-base, ease);
-    }
-
-    .post-feed > .post:hover .post-title {
-        font-variation-settings: "wght" 700, "opsz" 32;
-    }
 }

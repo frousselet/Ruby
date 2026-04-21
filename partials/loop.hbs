@@ -43,6 +43,12 @@
             <h2 class="post-title">
                 {{title}}
             </h2>
+
+            {{#if custom_excerpt}}
+                <p class="post-excerpt">{{custom_excerpt}}</p>
+            {{else if excerpt}}
+                <p class="post-excerpt">{{excerpt words="30"}}</p>
+            {{/if}}
         </header>
 
     </div>

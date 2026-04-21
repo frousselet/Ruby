@@ -4,11 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
     <title>{{meta_title page=(t " (Page %)")}}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..900&family=Fraunces:opsz,wght@9..144,300..900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..900;1,9..40,300..900&family=Fraunces:opsz,wght@9..144,300..900&display=swap">
 
     <link rel="stylesheet" href="{{asset "built/screen.css"}}">
 
@@ -30,26 +32,15 @@
                         {{/if}}
                     </a>
                 </div>
-                <button class="gh-search gh-icon-btn" aria-label="{{t "Search this site"}}" data-ghost-search>{{> "icons/search"}}</button>
                 <button class="gh-burger" aria-label="{{t "Toggle menu"}}"></button>
             </div>
 
             <nav class="gh-head-menu">
                 {{navigation}}
-                {{#unless @site.members_enabled}}
-                    {{#match @custom.navigation_layout "Stacked"}}
-                        <button class="gh-search gh-icon-btn" aria-label="{{t "Search this site"}}" data-ghost-search>{{> "icons/search"}}</button>
-                    {{/match}}
-                {{/unless}}
             </nav>
 
-            <div class="gh-head-actions">
-                {{#unless @site.members_enabled}}
-                    {{^match @custom.navigation_layout "Stacked"}}
-                        <button class="gh-search gh-icon-btn" aria-label="{{t "Search this site"}}" data-ghost-search>{{> "icons/search"}}</button>
-                    {{/match}}
-                {{else}}
-                    <button class="gh-search gh-icon-btn" aria-label="{{t "Search this site"}}" data-ghost-search>{{> "icons/search"}}</button>
+            {{#if @site.members_enabled}}
+                <div class="gh-head-actions">
                     <div class="gh-head-members">
                         {{#unless @member}}
                             {{#unless @site.members_invite_only}}
@@ -62,8 +53,8 @@
                             <a class="gh-head-btn gh-btn gh-primary-btn" href="#/portal/account" data-portal="account">{{t "Account"}}</a>
                         {{/unless}}
                     </div>
-                {{/unless}}
-            </div>
+                </div>
+            {{/if}}
         </div>
     </header>
 

@@ -53,7 +53,7 @@
                     "Modern sans-serif",
                     "Elegant serif"
                 ],
-                "default": "Modern sans-serif"
+                "default": "Elegant serif"
             },
             "body_font": {
                 "type": "select",

@@ -12,8 +12,17 @@
     --surface-bg: light-dark(#fff, #111);
     --border-subtle: light-dark(oklch(92% 0 0), oklch(25% 0 0));
 
-    --font-sans: "Inter", "Open Sans", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
+    --font-sans: "DM Sans", "Open Sans", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
     --font-serif: "Fraunces", Lora, Times, serif;
+    --font-heading: var(--font-serif);
+    --font-body: var(--font-sans);
+
+    /* Ghost's shared CSS uses these vars as the primary hook for headings
+       and body. Setting them here makes the Fraunces/Inter pairing apply
+       to elements like .gh-head-logo and generic h1–h6 that would
+       otherwise fall back to var(--font-sans). */
+    --gh-font-heading: var(--font-heading);
+    --gh-font-body: var(--font-body);
     --animation-base: cubic-bezier(0.2, 0, 0, 1);
     --shadow-base: 0 0 10px color-mix(in oklch, var(--black-color) 2%, transparent);
     --content-font-size: 1.7rem;
@@ -22,6 +31,20 @@
 h2:not(.post-title) {
     margin-top: 90px !important;
     margin-bottom: 30px !important;
+}
+
+/* Pairing: Fraunces on accents / Inter on body.
+   Forced here so the pair is active regardless of the Ghost admin
+   title_font / body_font setting. */
+.post-title,
+.gh-article-title,
+.gh-cover-title,
+.gh-card-title,
+.term-name,
+.gh-content > h2,
+.gh-content > h3,
+.gh-content > h4 {
+    font-family: var(--font-heading);
 }
 
 @media (prefers-color-scheme: dark) {

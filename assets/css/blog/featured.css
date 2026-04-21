@@ -58,10 +58,6 @@
     color: var(--white-color);
 }
 
-.post-feed .featured .post-excerpt {
-    display: none;
-}
-
 .post-feed .featured .post-footer {
     border-color: rgba(255, 255, 255, 0.2);
 }

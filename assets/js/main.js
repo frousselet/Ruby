@@ -1,6 +1,22 @@
 (function () {
     pagination(true);
 
+    // Split the site title into per-character spans so the CSS
+    // continuous focus-breathe animation can stagger via --i.
+    // Skipped for image logos.
+    document.querySelectorAll('.gh-head-logo').forEach(logo => {
+        if (logo.querySelector('img')) return;
+        const text = logo.textContent.trim();
+        if (!text) return;
+        logo.setAttribute('aria-label', text);
+        logo.innerHTML = [...text].map((char, i) => {
+            const c = char === ' ' ? '\u00A0' : char;
+            const r = (Math.random() * 2 - 1).toFixed(3);       // -1..1 — jitter on delay
+            const a = (0.7 + Math.random() * 0.6).toFixed(3);   // 0.7..1.3 — amplitude multiplier
+            return `<span class="gh-head-logo-char" style="--i: ${i}; --r: ${r}; --a: ${a}" aria-hidden="true">${c}</span>`;
+        }).join('');
+    });
+
     // Scroll-based parallax for full-width Koenig images.
     // Runs per-frame via rAF; honors prefers-reduced-motion.
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

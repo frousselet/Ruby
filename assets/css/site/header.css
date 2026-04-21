@@ -15,6 +15,40 @@
     --multiplier: 1.3;
 }
 
+.gh-head-logo {
+    font-weight: 900;
+}
+
+.gh-head-logo-char {
+    --r: 0;
+    --a: 1;
+    display: inline-block;
+    font-variation-settings: "wght" 900, "opsz" 40;
+    will-change: transform, font-variation-settings;
+    transform-origin: center 65%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    /* Single wave on hover: each letter lifts briefly and thins out,
+       once per hover. --r (−1..1) adds per-letter jitter to the stagger
+       delay, --a (0.7..1.3) varies the amplitude, so the wave feels
+       organic rather than mechanical. */
+    .gh-head-logo:hover .gh-head-logo-char {
+        animation: logo-pulse 1.2s ease-in-out calc(var(--i) * 70ms + var(--r) * 40ms);
+    }
+
+    @keyframes logo-pulse {
+        0%, 100% {
+            transform: scale(1);
+            font-variation-settings: "wght" 900, "opsz" 40;
+        }
+        50% {
+            transform: scale(calc(1 + 0.04 * var(--a)));
+            font-variation-settings: "wght" 600, "opsz" 80;
+        }
+    }
+}
+
 @media (max-width: 767px) {
     .gh-head {
         backdrop-filter: blur(60px);
@@ -38,14 +72,10 @@
         box-sizing: border-box;
     }
 
-    .gh-head-actions {
-        margin-right: 15px;
-    }
-
     .gh-head > .gh-inner {
         max-width: initial;
-        margin-left: -2px;
-        margin-right: -20px;
+        margin-left: 0;
+        margin-right: 0;
     }
 
     @media (prefers-color-scheme: light) {
@@ -75,7 +105,43 @@
         margin-right: 35px;
         margin-left: 20px;
         color: #888;
+        font-family: var(--font-heading);
         font-weight: 900;
+    }
+
+    /* Right-align the header navigation on desktop, regardless of the
+       navigation_layout setting. When the actions column is not rendered
+       (no members, no search), collapse the grid so the menu reaches the
+       pill's right edge with no trailing column-gap. */
+    .gh-head-menu {
+        justify-content: flex-end;
+    }
+
+    .is-head-left-logo .gh-head-inner:not(:has(.gh-head-actions)) {
+        grid-template-columns: auto 1fr;
+    }
+
+    .is-head-middle-logo .gh-head-menu {
+        grid-column: 3;
+    }
+
+    .is-head-middle-logo .gh-head-inner:not(:has(.gh-head-actions)) .gh-head-menu {
+        justify-self: end;
+    }
+}
+
+@media (min-width: 992px) {
+    /* Cancel upstream's right margin that would keep the menu away from the
+       pill edge — we want the menu flush with the inner's right edge so the
+       header is symmetric around the brand title. */
+    .is-head-left-logo .gh-head-menu,
+    .is-head-middle-logo .gh-head-menu {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .is-head-stacked .gh-head-menu {
+        justify-content: flex-end;
     }
 }
 
@@ -105,6 +171,7 @@
             margin-right: 35px;
             margin-left: 20px;
             color: #888;
+            font-family: var(--font-heading);
             font-weight: 900;
         }
     }
