@@ -1,13 +1,29 @@
 <div class="related-wrapper gh-outer">
-    {{#get "posts" limit="4" filter="tags:[{{post.tags}}]+id:-{{post.id}}" include="tags,authors" as |related|}}
-        {{#if related}}
-        <section class="related-posts gh-inner">
-            <div class="post-feed">
-                {{#foreach related}}
-                    {{> "loop"}}
-                {{/foreach}}
-            </div>
-        </section>
+    {{#match post.primary_tag.slug "gallery"}}
+        {{#if post.tags.[1]}}
+            {{#get "posts" filter="primary_tag:gallery+tag:{{post.tags.[1].slug}}+id:-{{post.id}}" limit="4" include="tags,authors" as |related|}}
+                {{#if related}}
+                <section class="related-posts gh-inner">
+                    <div class="post-feed">
+                        {{#foreach related}}
+                            {{> "loop"}}
+                        {{/foreach}}
+                    </div>
+                </section>
+                {{/if}}
+            {{/get}}
         {{/if}}
-    {{/get}}
+    {{else}}
+        {{#get "posts" limit="4" filter="tags:[{{post.tags}}]+primary_tag:-gallery+id:-{{post.id}}" include="tags,authors" as |related|}}
+            {{#if related}}
+            <section class="related-posts gh-inner">
+                <div class="post-feed">
+                    {{#foreach related}}
+                        {{> "loop"}}
+                    {{/foreach}}
+                </div>
+            </section>
+            {{/if}}
+        {{/get}}
+    {{/match}}
 </div>

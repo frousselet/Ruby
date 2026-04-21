@@ -7,7 +7,7 @@
 }
 
 .gh-article-title {
-    font-size: 2em !important;
+    font-size: 1.6em !important;
     font-weight: 900 !important;
     line-height: 1.4;
     letter-spacing: -0.03em;
@@ -93,7 +93,7 @@ figcaption {
 
 @media (min-width: 767px) {
     .gh-article-title {
-        font-size: 4.5em !important;
+        font-size: 3em !important;
         font-weight: 900 !important;
         margin-bottom: 30px;
         margin-top: 30px;

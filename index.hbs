@@ -5,7 +5,9 @@
 
     <div class="post-feed gh-feed">
         {{#foreach posts}}
-            {{> "loop"}}
+            {{#match primary_tag.slug "gallery"}}
+                {{> "loop"}}
+            {{/match}}
         {{/foreach}}
     </div>
 

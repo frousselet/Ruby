@@ -1,16 +1,21 @@
 :root {
-    --primary-color: var(--ghost-accent-color, #2ec4b6);
-    --primary-text-color: #333;
-    --secondary-text-color: #aaa;
-    --white-color: #fff;
-    --light-gray-color: #f4f4f4;
-    --mid-gray-color: #e9e9e9;
-    --dark-gray-color: #1a1a1a;
-    --black-color: #000;
-    --font-sans: "Open Sans", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
-    --font-serif: Lora, Times, serif;
-    --animation-base: ease-in-out;
-    --shadow-base: 0 0 10px rgba(0, 0, 0, 0.02);
+    color-scheme: light dark;
+
+    --primary-color: var(--ghost-accent-color, oklch(72% 0.12 190));
+    --primary-text-color: light-dark(oklch(25% 0 0), oklch(85% 0 0));
+    --secondary-text-color: light-dark(oklch(70% 0 0), oklch(55% 0 0));
+    --white-color: light-dark(#fff, #1a1a1a);
+    --light-gray-color: light-dark(#f4f4f4, #1f1f1f);
+    --mid-gray-color: light-dark(#e9e9e9, #2a2a2a);
+    --dark-gray-color: light-dark(#1a1a1a, #e9e9e9);
+    --black-color: light-dark(#000, #fff);
+    --surface-bg: light-dark(#fff, #111);
+    --border-subtle: light-dark(oklch(92% 0 0), oklch(25% 0 0));
+
+    --font-sans: "Inter", "Open Sans", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
+    --font-serif: "Fraunces", Lora, Times, serif;
+    --animation-base: cubic-bezier(0.2, 0, 0, 1);
+    --shadow-base: 0 0 10px color-mix(in oklch, var(--black-color) 2%, transparent);
     --content-font-size: 1.7rem;
 }
 

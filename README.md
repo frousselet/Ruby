@@ -1,4 +1,4 @@
-# Ruby
+# Rybu
 
 A multi-column [Ghost](https://github.com/TryGhost/Ghost) theme with a unique card layout. Make your publication more organized with cards and widgets.
 
@@ -23,7 +23,7 @@ yarn dev
 
 Now you can edit `/assets/css/` files, which will be compiled to `/assets/built/` automatically.
 
-The `zip` Gulp task packages the theme files into `dist/ruby.zip`, which you can then upload to your site.
+The `zip` Gulp task packages the theme files into `dist/rybu.zip`, which you can then upload to your site.
 
 ```bash
 yarn zip

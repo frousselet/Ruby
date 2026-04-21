@@ -1,0 +1,505 @@
+/* ============================================================
+   2026 modernization layer
+   Loaded last so it overrides prior rules where needed.
+   ============================================================ */
+
+
+/* ---------- 1. Typography: balanced headings, pretty paragraphs */
+
+.post-title,
+.gh-article-title,
+.gh-article-excerpt,
+.term-name,
+.gh-content > h2,
+.gh-content > h3 {
+    text-wrap: balance;
+}
+
+.gh-content > p,
+.gh-content > ul,
+.gh-content > ol,
+.post-excerpt {
+    text-wrap: pretty;
+}
+
+/* Wider text paragraphs on desktop (images keep their original width) */
+@media (min-width: 1200px) {
+    .gh-content > p,
+    .gh-content > ul,
+    .gh-content > ol,
+    .gh-content > blockquote,
+    .gh-content > h2,
+    .gh-content > h3,
+    .gh-content > h4 {
+        grid-column: wide;
+        max-width: 920px;
+        justify-self: center;
+        width: 100%;
+    }
+}
+
+/* Hyphenation for long words in narrow columns */
+.post-title,
+.gh-article-title {
+    hyphens: auto;
+    -webkit-hyphens: auto;
+}
+
+
+/* ---------- 2. View Transitions API (multi-page)
+   NB: @starting-style on site elements removed — it conflicted with the
+   scroll-driven and view-transition animations and caused visible flicker. */
+
+@view-transition {
+    navigation: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation-duration: 0.2s;
+        animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    ::view-transition-old(root) {
+        animation-name: vt-fade-out;
+    }
+
+    ::view-transition-new(root) {
+        animation-name: vt-fade-in;
+    }
+
+    @keyframes vt-fade-out {
+        to { opacity: 0; }
+    }
+
+    @keyframes vt-fade-in {
+        from { opacity: 0; }
+    }
+
+}
+
+
+/* ---------- 4. Scroll-driven animations */
+
+@supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+
+        /* Fade-in cards as they enter the viewport — subtle only.
+           Disabled on small screens. */
+        @media (min-width: 768px) {
+            .post-feed > .post {
+                animation: card-reveal linear both;
+                animation-timeline: view();
+                animation-range: entry 0% entry 60%;
+            }
+        }
+
+        @keyframes card-reveal {
+            from {
+                opacity: 0.7;
+                transform: translateY(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Subtle parallax on featured cover images.
+           Amplitude reduced on mobile. */
+        .post-feed .featured > .post-image {
+            animation-name: featured-parallax;
+            animation-timing-function: linear;
+            animation-fill-mode: both;
+            animation-duration: 1ms;
+            animation-timeline: view();
+            animation-range: entry 0% exit 100%;
+            will-change: transform;
+        }
+
+        @keyframes featured-parallax {
+            from { transform: translateY(-5%) scale(1.08); }
+            to   { transform: translateY(5%)  scale(1.08); }
+        }
+
+        @media (min-width: 768px) {
+            @keyframes featured-parallax {
+                from { transform: translateY(-12%) scale(1.15); }
+                to   { transform: translateY(12%)  scale(1.15); }
+            }
+        }
+
+        /* (Full-width Koenig image parallax is handled in JS for
+           broader browser support — see assets/js/main.js) */
+    }
+}
+
+
+/* JS-driven parallax setup for full-width Koenig images */
+
+@media (prefers-reduced-motion: no-preference) {
+    .kg-card.kg-image-card.kg-width-full {
+        overflow: hidden;
+    }
+
+    .kg-card.kg-image-card.kg-width-full > .kg-image {
+        display: block;
+        transform: translate3d(0, 0, 0) scale(1.15);
+        transform-origin: center center;
+        will-change: transform;
+    }
+
+    @media (min-width: 768px) {
+        .kg-card.kg-image-card.kg-width-full > .kg-image {
+            transform: translate3d(0, 0, 0) scale(1.4);
+        }
+    }
+}
+
+
+/* ---------- 5. :has() coordinated hover on cards */
+
+@media (hover: hover) {
+    .post-feed > .post:has(.post-link:hover) .post-image {
+        transform: scale(1.04);
+    }
+
+    .post-feed > .post .post-image {
+        transition: transform 0.6s cubic-bezier(0.2, 0, 0, 1);
+        will-change: transform;
+    }
+
+    .post-feed > .post:has(.post-link:hover) .post-title {
+        color: var(--primary-color);
+    }
+
+    .post-feed > .post .post-title {
+        transition: color 0.2s ease;
+    }
+
+    /* Clip overflow so zoom doesn't leak */
+    .post-feed > .post .post-media,
+    .post-feed > .post > .post-link > .post-image {
+        overflow: hidden;
+    }
+}
+
+
+
+
+/* ---------- 5a. Option C: image fills the card, text overlay with
+   dark gradient from slightly-tinted (behind text) to fully transparent
+   (bottom of card). White text with shadow for readability. */
+
+.post-feed > .post:not(.featured) .post-link {
+    position: relative;
+    display: block;
+    aspect-ratio: 3 / 2;
+    height: auto;
+}
+
+.post-feed > .post:not(.featured) .post-media {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+}
+
+.post-feed > .post:not(.featured) .u-placeholder.rectangle {
+    padding-bottom: 0;
+    position: absolute;
+    inset: 0;
+    height: 100%;
+}
+
+.post-feed > .post:not(.featured) .post-wrapper {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0, 0, 0, 0.08) 35%,
+        rgba(0, 0, 0, 0.55) 100%
+    );
+    padding: 80px 20px 24px;
+    z-index: 20;
+}
+
+.post-feed > .post:not(.featured) .post-tag,
+.post-feed > .post:not(.featured) .post-year,
+.post-feed > .post:not(.featured) .post-title {
+    color: #fff !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.post-feed > .post:not(.featured) .post-tag,
+.post-feed > .post:not(.featured) .post-year {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.post-feed > .post:not(.featured) .post-tag + .post-year::before {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+
+/* ---------- 5b. Liquid Glass treatment on cards (same recipe as the header) */
+
+.post-feed > .post {
+    box-shadow:
+        /* hairline top shine */
+        inset 0 0.5px 0 light-dark(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.08)),
+        /* bottom contact — fakes thickness */
+        inset 0 -0.5px 0 light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.25)),
+        /* outer hairline rim */
+        0 0 0 0.5px light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.08)),
+        /* soft ambient shadow */
+        0 12px 32px -12px rgba(0, 0, 0, 0.16),
+        0 2px 6px -2px rgba(0, 0, 0, 0.05);
+    transition:
+        box-shadow 0.45s cubic-bezier(0.2, 0, 0, 1),
+        transform 0.45s cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Home: only shadow + transform animate on interaction.
+   Hairline rims stay stable to preserve the Liquid Glass identity. */
+.home-template .post-feed > .post:hover {
+    box-shadow:
+        inset 0 0.5px 0 light-dark(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.08)),
+        inset 0 -0.5px 0 light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.25)),
+        0 0 0 0.5px light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.08)),
+        0 20px 48px -16px rgba(0, 0, 0, 0.22),
+        0 4px 10px -2px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px);
+}
+
+.home-template .post-feed > .post:active {
+    box-shadow:
+        inset 0 0.5px 0 light-dark(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.08)),
+        inset 0 -0.5px 0 light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.25)),
+        0 0 0 0.5px light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.08)),
+        0 8px 16px -6px rgba(0, 0, 0, 0.12);
+    transform: translateY(0) scale(0.995);
+    transition-duration: 0.15s;
+}
+
+/* Non-home feeds: deeper shadow on hover, rims unchanged. */
+.post-feed > .post:not(.home-template .post-feed > .post):hover {
+    box-shadow:
+        inset 0 0.5px 0 light-dark(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.08)),
+        inset 0 -0.5px 0 light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.25)),
+        0 0 0 0.5px light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.08)),
+        0 16px 40px -12px rgba(0, 0, 0, 0.18),
+        0 3px 8px -2px rgba(0, 0, 0, 0.06);
+}
+
+/* Liquid Glass — macOS Tahoe-inspired header:
+   - heavy blur + saturation for vivid refraction
+   - top-to-bottom tint gradient (glass body)
+   - inset top highlight (glass rim reflection)
+   - inset bottom shadow (contact/depth)
+   - faint outer rim for edge definition */
+
+/* Liquid Glass — authentic Apple recipe:
+   uniform tint + contrast/saturate refraction + inset shine + contact. */
+
+@media (min-width: 767px) {
+    .gh-head {
+        background-color: light-dark(
+            rgba(255, 255, 255, 0.55),
+            rgba(25, 25, 28, 0.55)
+        ) !important;
+        backdrop-filter: blur(30px) saturate(1.8) contrast(1.05);
+        -webkit-backdrop-filter: blur(30px) saturate(1.8) contrast(1.05);
+        box-shadow:
+            /* hairline shine — 0.5px at the top edge only */
+            inset 0 0.5px 0 light-dark(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.08)),
+            /* contact hairline at bottom — glass thickness */
+            inset 0 -0.5px 0 light-dark(rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.25)),
+            /* outer rim */
+            0 0 0 0.5px light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.08)),
+            /* ambient shadow */
+            0 20px 60px -20px rgba(0, 0, 0, 0.22),
+            0 4px 12px -4px rgba(0, 0, 0, 0.06) !important;
+    }
+}
+
+@media (max-width: 766px) {
+    .gh-head {
+        background-color: light-dark(
+            rgba(255, 255, 255, 0.55),
+            rgba(25, 25, 28, 0.55)
+        ) !important;
+        backdrop-filter: blur(30px) saturate(1.8) contrast(1.05) !important;
+        -webkit-backdrop-filter: blur(30px) saturate(1.8) contrast(1.05) !important;
+        box-shadow:
+            inset 0 0.5px 0 light-dark(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.06)),
+            inset 0 -0.5px 0 light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.25)),
+            0 0 0 0.5px light-dark(rgba(0, 0, 0, 0.06), rgba(255, 255, 255, 0.06)),
+            0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    }
+}
+
+
+/* ---------- 6. Magnetic / animated primary buttons (@property) */
+
+@property --btn-gradient-pos {
+    syntax: "<percentage>";
+    initial-value: 50%;
+    inherits: false;
+}
+
+.gh-primary-btn {
+    background: radial-gradient(
+        circle at var(--btn-gradient-pos) 50%,
+        color-mix(in oklch, var(--primary-color) 80%, white) 0%,
+        var(--primary-color) 60%
+    );
+    transition:
+        --btn-gradient-pos 0.4s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    box-shadow: 0 4px 14px color-mix(in oklch, var(--primary-color) 40%, transparent);
+}
+
+.gh-primary-btn:hover {
+    --btn-gradient-pos: 100%;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px color-mix(in oklch, var(--primary-color) 50%, transparent);
+}
+
+.gh-primary-btn:active {
+    transform: translateY(0);
+}
+
+
+/* ---------- 7. Grain / noise overlay */
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0.035;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.9 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-size: 200px 200px;
+}
+
+@media (prefers-color-scheme: dark) {
+    body::after {
+        mix-blend-mode: screen;
+        opacity: 0.045;
+    }
+}
+
+
+/* ---------- 8. Mesh gradient on featured cards without image */
+
+.post-feed .featured.no-image .post-link::before {
+    background:
+        radial-gradient(at 20% 20%, color-mix(in oklch, var(--tag-color, var(--ghost-accent-color)) 80%, white) 0%, transparent 50%),
+        radial-gradient(at 80% 0%,  color-mix(in oklch, var(--tag-color, var(--ghost-accent-color)) 60%, black) 0%, transparent 55%),
+        radial-gradient(at 60% 100%, color-mix(in oklch, var(--tag-color, var(--ghost-accent-color)) 70%, black) 0%, transparent 50%),
+        var(--tag-color, var(--ghost-accent-color));
+}
+
+
+/* ---------- 9. Container queries on post cards */
+
+.post-feed > .post {
+    container-type: inline-size;
+    container-name: card;
+}
+
+@container card (min-width: 380px) {
+    .post-title {
+        font-size: 1.9rem;
+    }
+
+    .post-wrapper {
+        padding: 28px;
+    }
+}
+
+@container card (min-width: 520px) {
+    .post-title {
+        font-size: 2.2rem;
+    }
+}
+
+
+/* ---------- 10. Year badge on cards + article headers */
+
+.post-year {
+    display: inline-block;
+    margin-top: 0;
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--secondary-text-color);
+    font-variant-numeric: tabular-nums;
+    vertical-align: baseline;
+}
+
+.post-tag + .post-year::before {
+    content: "•";
+    display: inline-block;
+    margin: 0 0.6em;
+    color: var(--secondary-text-color);
+    font-weight: 400;
+}
+
+.gh-article-year {
+    display: block;
+    text-align: center;
+    font-family: var(--font-sans);
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    color: var(--secondary-text-color);
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 767px) {
+    .gh-article-year {
+        font-size: 1.3rem;
+        margin-bottom: 16px;
+    }
+}
+
+
+/* ---------- 11. Variable font optical sizing + kinetic heading */
+
+html {
+    font-optical-sizing: auto;
+}
+
+.gh-article-title,
+.post-title,
+.has-serif-title {
+    font-synthesis: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .gh-article-title {
+        font-variation-settings: "wght" 800, "opsz" 96;
+        transition: font-variation-settings 0.5s var(--animation-base, ease);
+    }
+
+    .gh-article-title:hover {
+        font-variation-settings: "wght" 900, "opsz" 144;
+    }
+
+    .post-title {
+        transition: font-variation-settings 0.3s var(--animation-base, ease);
+    }
+
+    .post-feed > .post:hover .post-title {
+        font-variation-settings: "wght" 700, "opsz" 32;
+    }
+}

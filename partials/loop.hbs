@@ -30,9 +30,15 @@
 
     <div class="post-wrapper">
         <header class="post-header">
-            {{#primary_tag}}
-                <span class="post-tag">{{name}}</span>
-            {{/primary_tag}}
+            {{#match primary_tag.slug "gallery"}}
+                {{#foreach tags visibility="public" limit="2"}}
+                    {{#if @last}}<span class="post-tag">{{name}}</span>{{/if}}
+                {{/foreach}}
+            {{else}}
+                {{#primary_tag}}<span class="post-tag">{{name}}</span>{{/primary_tag}}
+            {{/match}}
+
+            <span class="post-year">{{date format="YYYY"}}</span>
 
             <h2 class="post-title">
                 {{title}}
