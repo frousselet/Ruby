@@ -22,6 +22,8 @@
 .gh-head-logo-char {
     --r: 0;
     --a: 1;
+    --pos: 0;
+    --abs-pos: 0;
     display: inline-block;
     font-variation-settings: "wght" 900, "opsz" 40;
     will-change: transform, font-variation-settings;
@@ -29,22 +31,82 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    /* Single wave on hover: each letter lifts briefly and thins out,
-       once per hover. --r (−1..1) adds per-letter jitter to the stagger
-       delay, --a (0.7..1.3) varies the amplitude, so the wave feels
-       organic rather than mechanical. */
-    .gh-head-logo:hover .gh-head-logo-char {
-        animation: logo-pulse 1.2s ease-in-out calc(var(--i) * 70ms + var(--r) * 40ms);
+    /* Intro wave: each letter briefly scales up, thins and loosens its
+       tracking, once on page load. The .is-intro class is added by JS
+       and removed once the staggered wave has settled so :hover can take
+       over cleanly. --r (−1..1) jitters the stagger delay, --a (0.7..1.3)
+       varies amplitude so the wave feels organic. */
+    .gh-head-logo.is-intro .gh-head-logo-char {
+        animation: logo-pulse 0.7s ease-in-out calc(var(--i) * 40ms + var(--r) * 25ms);
     }
 
     @keyframes logo-pulse {
         0%, 100% {
             transform: scale(1);
             font-variation-settings: "wght" 900, "opsz" 40;
+            letter-spacing: -0.02em;
         }
         50% {
             transform: scale(calc(1 + 0.04 * var(--a)));
             font-variation-settings: "wght" 600, "opsz" 80;
+            letter-spacing: 0.015em;
+        }
+    }
+
+    /* Hover stretch: the title is "pulled" from both ends as long as the
+       cursor stays over it. Letter-spacing is animated on the parent so
+       the whole string expands uniformly — no per-letter jitter in the
+       gaps. Each character's stroke weight then interpolates between
+       heavy at the ends and thin at the centre (--abs-pos), so the band
+       reads as thickest at the anchors and thinnest in the middle. Opsz
+       climbs toward the display form where the band is thinnest.
+       Transitions rather than keyframes so the stretched state holds
+       until mouse-leave. */
+    /* Elastic in both directions:
+       — enter: band stretches a hair past its resting stretched state,
+         then settles into place;
+       — leave: tension releases, the letters briefly compress tighter
+         than their natural spacing, then settle back. Same back-out
+         curve on both sides, shorter on the return for a snappier feel. */
+    .gh-head-logo {
+        transition: letter-spacing 0.4s cubic-bezier(0.34, 1.56, 0.5, 1);
+    }
+
+    .gh-head-logo:hover {
+        letter-spacing: 0.12em;
+        transition: letter-spacing 0.5s cubic-bezier(0.34, 1.56, 0.5, 1);
+    }
+
+    .gh-head-logo-char {
+        transition: font-variation-settings 0.4s cubic-bezier(0.34, 1.5, 0.5, 1) calc(var(--r) * 20ms);
+    }
+
+    .gh-head-logo:hover .gh-head-logo-char {
+        font-variation-settings:
+            "wght" calc(300 + 600 * var(--abs-pos)),
+            "opsz" calc(120 - 80 * var(--abs-pos));
+        transition: font-variation-settings 0.5s cubic-bezier(0.34, 1.5, 0.5, 1) calc(var(--r) * 20ms);
+    }
+
+    /* Desktop-only hover expansion on menu items. Same elastic curve as the
+       brand title, but subtler amplitude and a tighter duration so menu
+       interactions feel responsive rather than theatrical. Weight also
+       interpolates from medium to bold on hover for a quiet emphasis. */
+    @media (min-width: 767px) {
+        .gh-head-menu .nav a {
+            display: inline-block;
+            font-weight: 500;
+            transition:
+                letter-spacing 0.3s cubic-bezier(0.34, 1.56, 0.5, 1),
+                font-weight 0.25s ease;
+        }
+
+        .gh-head-menu .nav a:hover {
+            letter-spacing: 0.15em;
+            font-weight: 700;
+            transition:
+                letter-spacing 0.35s cubic-bezier(0.34, 1.56, 0.5, 1),
+                font-weight 0.3s ease;
         }
     }
 }

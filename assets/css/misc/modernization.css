@@ -170,12 +170,40 @@
         will-change: transform;
     }
 
-    .post-feed > .post:has(.post-link:hover) .post-title {
-        color: var(--primary-color);
+    /* Bouncy upward lift on card hover — same elastic family as the header
+       title and menu items. Curve pushed harder: earlier acceleration
+       (x1=0.18) and much higher y1 (2.3) so the overshoot peak is clearly
+       visible before settling. */
+    .post-feed > .post .post-tag,
+    .post-feed > .post .post-year,
+    .post-feed > .post .post-title {
+        transition: transform 0.55s cubic-bezier(0.18, 2.3, 0.4, 1);
     }
 
     .post-feed > .post .post-title {
-        transition: color 0.2s ease;
+        transition: color 0.2s ease, transform 0.55s cubic-bezier(0.18, 2.3, 0.4, 1);
+    }
+
+    .post-feed > .post:has(.post-link:hover) .post-title {
+        color: var(--primary-color);
+        transform: translateY(-6px);
+    }
+
+    .post-feed > .post:has(.post-link:hover) .post-tag,
+    .post-feed > .post:has(.post-link:hover) .post-year {
+        transform: translateY(-9px);
+    }
+
+    /* Stagger only on cards with an excerpt — on bare cards the delays
+       would read as a dead pause since there's no excerpt reveal filling
+       the gap. */
+    .post-feed > .post:has(.post-excerpt):has(.post-link:hover) .post-title {
+        transition-delay: 50ms;
+    }
+
+    .post-feed > .post:has(.post-excerpt):has(.post-link:hover) .post-tag,
+    .post-feed > .post:has(.post-excerpt):has(.post-link:hover) .post-year {
+        transition-delay: 100ms;
     }
 
     /* Clip overflow so zoom doesn't leak */
@@ -184,6 +212,7 @@
         overflow: hidden;
     }
 }
+
 
 
 
