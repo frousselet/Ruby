@@ -67,6 +67,10 @@
                 "type": "boolean",
                 "default": true,
                 "group": "post"
+            },
+            "mapkit_token": {
+                "type": "text",
+                "default": ""
             }
         }
     },

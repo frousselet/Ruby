@@ -14,6 +14,10 @@
 
     <link rel="stylesheet" href="{{asset "built/screen.css"}}">
 
+    {{#if @custom.mapkit_token}}
+    <meta name="rybu:mapkit-token" content="{{@custom.mapkit_token}}">
+    {{/if}}
+
     {{ghost_head}}
 </head>
 

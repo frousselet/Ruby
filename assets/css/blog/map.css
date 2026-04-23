@@ -1,0 +1,194 @@
+/* Travel-route map embedded in posts via .rybu-map in a Ghost HTML card. */
+
+.rybu-map {
+    position: relative;
+    width: 100%;
+    height: clamp(280px, 55vw, 520px);
+    margin: 2em 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f4f4f4;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Width variants — escape the text column via Ghost's gh-canvas grid.
+   Works whether the map is a direct child of .gh-canvas or nested inside
+   the .kg-html-card wrapper produced by Ghost's HTML card. */
+.gh-canvas > .rybu-map[data-width="wide"],
+.gh-canvas > *:has(.rybu-map[data-width="wide"]) {
+    grid-column: wide;
+}
+
+.gh-canvas > .rybu-map[data-width="full"],
+.gh-canvas > *:has(.rybu-map[data-width="full"]) {
+    grid-column: full;
+}
+
+.rybu-map[data-width="wide"] {
+    height: clamp(320px, 60vh, 600px);
+}
+
+.rybu-map[data-width="full"] {
+    height: clamp(400px, 70vh, 720px);
+    border-radius: 0;
+    box-shadow: none;
+    margin-inline: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .rybu-map {
+        background: #1a1a1c;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+}
+
+/* Placeholder list (visible until MapKit renders, and as JS-off fallback) */
+.rybu-map-placeholder {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 1.5em;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6em;
+    align-content: center;
+    justify-content: center;
+    color: #555;
+    font-size: 0.9em;
+    pointer-events: none;
+}
+
+.rybu-map-placeholder li {
+    padding: 0.3em 0.8em;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+    .rybu-map-placeholder {
+        color: #bbb;
+    }
+    .rybu-map-placeholder li {
+        background: rgba(40, 40, 40, 0.8);
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+}
+
+.rybu-map-ready .rybu-map-placeholder {
+    display: none;
+}
+
+.rybu-map-error::after {
+    content: "Carte indisponible";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 0.9em;
+    font-style: italic;
+}
+
+.rybu-map-error .rybu-map-placeholder {
+    display: none;
+}
+
+/* --- Leaflet UI polish, scoped to our container --- */
+
+/* Kill the grey/white flash before tiles load. Leaflet's default
+   .leaflet-container background is #ddd and gets applied to our root
+   element once L.map() attaches — we beat it with double-class
+   specificity and match the expected tile colour in each scheme. */
+.rybu-map.leaflet-container {
+    background: #f4f4f4;
+}
+
+@media (prefers-color-scheme: dark) {
+    .rybu-map.leaflet-container {
+        background: #1a1a1c;
+    }
+}
+
+.rybu-map .leaflet-control-zoom {
+    border: none !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.rybu-map .leaflet-control-zoom a {
+    background: rgba(255, 255, 255, 0.9);
+    color: #222;
+    border: none;
+    font-weight: 400;
+    transition: background 0.15s ease, color 0.15s ease;
+    backdrop-filter: blur(6px);
+}
+
+.rybu-map .leaflet-control-zoom a:hover {
+    background: #fff;
+    color: #000;
+}
+
+.rybu-map .leaflet-control-attribution {
+    background: rgba(255, 255, 255, 0.75) !important;
+    color: rgba(0, 0, 0, 0.6) !important;
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+    border-top-left-radius: 6px;
+    backdrop-filter: blur(6px);
+}
+
+.rybu-map .leaflet-control-attribution a {
+    color: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Subtle glow around circle markers, both modes */
+.rybu-map .leaflet-overlay-pane circle {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+@media (prefers-color-scheme: dark) {
+    .rybu-map .leaflet-control-zoom {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+    }
+    .rybu-map .leaflet-control-zoom a {
+        background: rgba(30, 30, 32, 0.75);
+        color: rgba(255, 255, 255, 0.9);
+        border-color: transparent;
+    }
+    .rybu-map .leaflet-control-zoom a:hover {
+        background: rgba(50, 50, 52, 0.9);
+        color: #fff;
+    }
+    .rybu-map .leaflet-control-attribution {
+        background: rgba(20, 20, 22, 0.55) !important;
+        color: rgba(255, 255, 255, 0.5) !important;
+    }
+    .rybu-map .leaflet-control-attribution a {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+    /* White markers on dark tiles get a soft white glow so they read as luminous dots */
+    .rybu-map .leaflet-overlay-pane circle {
+        filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.35))
+                drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+    }
+    /* Slightly brighter polylines in dark mode — the default white can look flat */
+    .rybu-map .leaflet-overlay-pane path:not(circle) {
+        filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
+    }
+    /* Tooltip skin that matches the dark theme */
+    .rybu-map .leaflet-tooltip {
+        background: rgba(25, 25, 27, 0.95);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+    .rybu-map .leaflet-tooltip-top::before { border-top-color: rgba(25, 25, 27, 0.95); }
+    .rybu-map .leaflet-tooltip-bottom::before { border-bottom-color: rgba(25, 25, 27, 0.95); }
+    .rybu-map .leaflet-tooltip-left::before { border-left-color: rgba(25, 25, 27, 0.95); }
+    .rybu-map .leaflet-tooltip-right::before { border-right-color: rgba(25, 25, 27, 0.95); }
+}
