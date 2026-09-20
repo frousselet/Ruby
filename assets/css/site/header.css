@@ -92,7 +92,7 @@
        brand title, but subtler amplitude and a tighter duration so menu
        interactions feel responsive rather than theatrical. Weight also
        interpolates from medium to bold on hover for a quiet emphasis. */
-    @media (min-width: 767px) {
+    @media (min-width: 768px) {
         .gh-head-menu .nav a {
             display: inline-block;
             font-weight: 500;
@@ -118,7 +118,7 @@
     }
 }
 
-@media (min-width: 767px) {
+@media (min-width: 768px) {
     .gh-head {
         position: fixed;
         z-index: 9999;
@@ -225,7 +225,7 @@
         }
     }
 
-    @media (min-width: 767px) {
+    @media (min-width: 768px) {
         .nav-articles:not(.gh-dropdown > .nav-about):before,
         .nav-about:not(.gh-dropdown > .nav-about):before,
         .nav-years:not(.gh-dropdown > .nav-about):before {

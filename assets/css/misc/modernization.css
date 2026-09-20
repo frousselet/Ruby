@@ -380,7 +380,7 @@
 /* Liquid Glass — authentic Apple recipe:
    uniform tint + contrast/saturate refraction + inset shine + contact. */
 
-@media (min-width: 767px) {
+@media (min-width: 768px) {
     .gh-head {
         background-color: light-dark(
             rgba(255, 255, 255, 0.55),
@@ -401,7 +401,7 @@
     }
 }
 
-@media (max-width: 766px) {
+@media (max-width: 767px) {
     /* Mobile header = floating Liquid Glass pill.
        Pill position, glass material and inner layout apply in BOTH states
        (menu closed and menu open) so the brand row — logo, search, burger —
@@ -655,7 +655,7 @@ body::after {
     margin-bottom: 10px;
 }
 
-@media (min-width: 767px) {
+@media (min-width: 768px) {
     .gh-article-year {
         font-size: 1.3rem;
         margin-bottom: 16px;
