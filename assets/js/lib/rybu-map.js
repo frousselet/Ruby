@@ -176,6 +176,23 @@
         el.appendChild(ph);
     }
 
+    // Keep wheel and trackpad-pinch events away from whichever provider renders.
+    // MapKit JS 6 zooms and pans on wheel events without a modifier key, and its
+    // isZoomEnabled option is documented for pinch gestures and the zoom control
+    // only, so the option alone isn't proof the wheel path is covered. Capture
+    // phase, and no preventDefault: the article keeps scrolling and the browser
+    // keeps its own page zoom, the map just never sees the event.
+    var WHEEL_EVENTS = ['wheel', 'gesturestart', 'gesturechange', 'gestureend'];
+
+    function blockWheelZoom(el) {
+        WHEEL_EVENTS.forEach(function (type) {
+            el.addEventListener(type, function (e) {
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+            }, true);
+        });
+    }
+
     // ---------- Apple MapKit provider ----------
 
     // MapKit JS 6 modular loader: mapkit.core.js is a stub that self-initializes
@@ -225,6 +242,7 @@
             showsMapTypeControl: false,
             showsZoomControl: false,
             isRotationEnabled: false,
+            isZoomEnabled: false,
             colorScheme: darkMode ? mk.ColorScheme.Dark : mk.ColorScheme.Light
         });
 
@@ -322,8 +340,11 @@
             : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 
         var map = L.map(el, {
-            zoomControl: true,
+            zoomControl: false,
             scrollWheelZoom: false,
+            doubleClickZoom: false,
+            touchZoom: false,
+            boxZoom: false,
             attributionControl: true
         });
 
@@ -396,6 +417,7 @@
         el.setAttribute('role', 'img');
         el.setAttribute('aria-label', buildA11yLabel(cfg));
         buildPlaceholder(el, cfg);
+        blockWheelZoom(el);
 
         var loader = useApple ? loadMapKit : loadLeaflet;
         var renderer = useApple ? renderMapKit : renderLeaflet;

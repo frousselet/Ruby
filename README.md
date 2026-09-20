@@ -20,6 +20,11 @@ Two providers are supported, picked automatically:
 
 Strokes and markers use a monochrome ink palette: black on light backgrounds, white on dark.
 
+Readers can't zoom: there is no zoom control, and wheel, trackpad, double-click
+and pinch zoom are all off, so scrolling through a post is never captured by a
+map. Framing stays what the post asks for, auto-fitted over every point or set
+explicitly with `data-zoom`. Panning still works.
+
 ## Quick start
 
 Paste this in a Ghost HTML card:
