@@ -177,14 +177,14 @@
     }
 
     // Keep wheel and trackpad-pinch events away from whichever provider renders.
-    // MapKit JS 6 zooms and pans on wheel events without a modifier key, and its
-    // isZoomEnabled option is documented for pinch gestures and the zoom control
-    // only, so the option alone isn't proof the wheel path is covered. Capture
-    // phase, and no preventDefault: the article keeps scrolling and the browser
-    // keeps its own page zoom, the map just never sees the event.
+    // MapKit JS 6 zooms *and pans* on wheel events without a modifier key, and
+    // isZoomEnabled/isScrollEnabled are documented for pinch, the zoom control
+    // and pointer or touchscreen gestures, so neither is proof the wheel path is
+    // covered. Capture phase, and no preventDefault: the article keeps scrolling
+    // and the browser keeps its own page zoom, the map just never sees the event.
     var WHEEL_EVENTS = ['wheel', 'gesturestart', 'gesturechange', 'gestureend'];
 
-    function blockWheelZoom(el) {
+    function blockWheelGestures(el) {
         WHEEL_EVENTS.forEach(function (type) {
             el.addEventListener(type, function (e) {
                 e.stopPropagation();
@@ -243,6 +243,7 @@
             showsZoomControl: false,
             isRotationEnabled: false,
             isZoomEnabled: false,
+            isScrollEnabled: false,
             colorScheme: darkMode ? mk.ColorScheme.Dark : mk.ColorScheme.Light
         });
 
@@ -345,6 +346,8 @@
             doubleClickZoom: false,
             touchZoom: false,
             boxZoom: false,
+            dragging: false,
+            keyboard: false,
             attributionControl: true
         });
 
@@ -417,7 +420,7 @@
         el.setAttribute('role', 'img');
         el.setAttribute('aria-label', buildA11yLabel(cfg));
         buildPlaceholder(el, cfg);
-        blockWheelZoom(el);
+        blockWheelGestures(el);
 
         var loader = useApple ? loadMapKit : loadLeaflet;
         var renderer = useApple ? renderMapKit : renderLeaflet;
