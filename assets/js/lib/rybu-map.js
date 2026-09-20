@@ -25,9 +25,10 @@
  * <script type="application/json"> of the div with keys
  *   { zoom, layers: [{type, points: [{label, lat, lng}, ...]}, ...] }.
  *
- * Provider: if a MapKit JS developer token is set (meta[name="rybu:mapkit-token"],
- * injected from @custom.mapkit_token), Apple Maps is used. Otherwise the map
- * degrades gracefully to Leaflet + CARTO/OSM tiles — no API key required.
+ * Provider: if a Maps token is set (meta[name="rybu:mapkit-token"], injected from
+ * @custom.mapkit_token), Apple Maps is used through MapKit JS 6, loaded modularly
+ * from mapkit.core.js with only the "full-map" library. Otherwise the map degrades
+ * gracefully to Leaflet + CARTO/OSM tiles, no API key required.
  */
 (function () {
     var nodes = document.querySelectorAll('.rybu-map');
@@ -177,39 +178,39 @@
 
     // ---------- Apple MapKit provider ----------
 
-    var MAPKIT_SRC = 'https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js';
+    // MapKit JS 6 modular loader: mapkit.core.js is a stub that self-initializes
+    // from data-token and pulls in only the libraries listed in data-libraries.
+    // "full-map" covers Map plus overlays and annotations, which is all we draw.
+    var MAPKIT_SRC = 'https://cdn.apple-mapkit.com/mk/6/mapkit.core.js';
+    var MAPKIT_LIBRARIES = 'full-map';
+    var MAPKIT_CALLBACK = '__rybuMapKitReady';
     var mapkitReady = null;
 
     function loadMapKit() {
         if (mapkitReady) return mapkitReady;
         mapkitReady = new Promise(function (resolve, reject) {
-            if (window.mapkit && window.mapkit.Map) {
-                initMapKit().then(resolve, reject);
-                return;
-            }
+            if (window.mapkit && window.mapkit.Map) { resolve(window.mapkit); return; }
+
+            window[MAPKIT_CALLBACK] = function () {
+                // In v6 data-callback also fires when a library fails to load,
+                // so check that the interfaces we need actually landed.
+                if (window.mapkit && window.mapkit.Map) resolve(window.mapkit);
+                else reject(new Error('mapkit_libraries_failed'));
+            };
+
             var s = document.createElement('script');
             s.src = MAPKIT_SRC;
-            s.crossOrigin = '';
+            s.crossOrigin = 'anonymous';
             s.async = true;
-            s.onload = function () { initMapKit().then(resolve, reject); };
+            s.dataset.callback = MAPKIT_CALLBACK;
+            s.dataset.libraries = MAPKIT_LIBRARIES;
+            s.dataset.token = token;
+            var lang = document.documentElement.lang;
+            if (lang) s.dataset.language = lang;
             s.onerror = function () { reject(new Error('mapkit_script_failed')); };
             document.head.appendChild(s);
         });
         return mapkitReady;
-    }
-
-    function initMapKit() {
-        return new Promise(function (resolve, reject) {
-            try {
-                window.mapkit.init({
-                    authorizationCallback: function (done) { done(token); },
-                    language: document.documentElement.lang || undefined
-                });
-                resolve(window.mapkit);
-            } catch (err) {
-                reject(err);
-            }
-        });
     }
 
     function renderMapKit(el, cfg) {
@@ -224,7 +225,7 @@
             showsMapTypeControl: false,
             showsZoomControl: false,
             isRotationEnabled: false,
-            colorScheme: darkMode ? mk.Map.ColorSchemes.Dark : mk.Map.ColorSchemes.Light
+            colorScheme: darkMode ? mk.ColorScheme.Dark : mk.ColorScheme.Light
         });
 
         var allAnnotations = [];
@@ -406,9 +407,9 @@
                 el.classList.add('rybu-map-error');
                 el.setAttribute('data-rybu-error', 'render_failed');
             }
-        }, function () {
+        }, function (err) {
             el.classList.add('rybu-map-error');
-            el.setAttribute('data-rybu-error', errorKey);
+            el.setAttribute('data-rybu-error', (err && err.message) || errorKey);
         });
     }
 
