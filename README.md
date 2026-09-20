@@ -15,10 +15,10 @@ Rybu adds a lightweight embeddable map component for travel routes and points of
 
 Two providers are supported, picked automatically:
 
-- **Apple MapKit JS** when an Apple Developer token is configured (Ghost Admin → Design → *Mapkit token*). Requires an Apple Developer account ($99/year).
+- **Apple Maps**, through MapKit JS 6, when a Maps token is configured (Ghost Admin → Design → *Mapkit token*). Requires an Apple Developer Program membership ($99/year).
 - **Leaflet + CARTO/OSM tiles** when no token is set. Free, no API key, with light/dark basemap auto-switched via `prefers-color-scheme`.
 
-Strokes and markers use a monochrome ink palette — black on light backgrounds, white on dark.
+Strokes and markers use a monochrome ink palette: black on light backgrounds, white on dark.
 
 ## Quick start
 
@@ -104,14 +104,43 @@ In `full` mode the map spans the viewport edge-to-edge (no border-radius, no sha
 
 Ghost doesn't let themes add custom Koenig cards, but you can save any `<div class="rybu-map">…</div>` as a **snippet** (select the HTML card → *Save as snippet*) and insert it via `/<snippet-name>` in future posts.
 
-## Enabling Apple MapKit (optional)
+## Enabling Apple Maps (optional)
 
-1. Apple Developer portal → MapKit JS → create a key → download the `.p8` private key.
-2. Note `Team ID` and `Key ID`.
-3. Generate a developer token (JWT signed ES256) with `iss=Team ID`, `kid=Key ID`, `iat`, `exp`, and — critical — an `origin` claim restricted to your blog's domain so a leaked token can't be reused elsewhere.
-4. Paste the JWT in *Ghost Admin → Design → Customize → Mapkit token*.
+Apple Maps needs a Maps token. You don't sign a JWT yourself: Apple generates the
+token for you in the developer portal.
+
+1. Go to [developer.apple.com/account](https://developer.apple.com/account), click
+   **Services** in the sidebar, then **Configure** under the Maps section.
+2. Click **Tokens** at the top of the usage dashboard, then **Tokens (+)**.
+3. Set **Token Type** to `MapKit JS`.
+4. Set **Restriction Type** to `Domain`, list your blog's domain(s) under
+   **Websites**, and pick a **Domain Token Validation Duration**. `No Expiration`
+   is the sane choice here, since the token lives in a theme setting nobody will
+   remember to rotate.
+5. Click **Create**, then copy the token.
+6. Paste it in *Ghost Admin → Design → Customize → Mapkit token*.
+
+The theme serves the token publicly in the page `<head>`, which is how MapKit JS is
+designed to work. The domain restriction is what protects it, not secrecy. Revoke a
+token at any time from the same screen.
+
+Free tier, per Apple Developer Program membership: 250,000 map views and 25,000
+service calls per day. Usage is visible at
+[maps.developer.apple.com](https://maps.developer.apple.com/).
 
 Without a token the theme falls back to Leaflet + CARTO tiles automatically.
+
+### MapKit JS version
+
+The theme loads MapKit JS 6 from its modular entry point:
+
+```
+https://cdn.apple-mapkit.com/mk/6/mapkit.core.js
+```
+
+with `data-libraries="full-map"`, so the browser downloads only the map, overlay and
+annotation interfaces instead of the whole framework. The major version is pinned at
+`6` and Apple serves the latest `minor.patch` behind that URL.
 
 # Development
 
