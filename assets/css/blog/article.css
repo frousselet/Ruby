@@ -91,7 +91,7 @@ figcaption {
     }
 }
 
-@media (min-width: 767px) {
+@media (min-width: 768px) {
     .gh-article-title {
         font-size: 3em !important;
         font-weight: 900 !important;
@@ -201,7 +201,7 @@ figcaption {
         color: #333;
     }
 
-    @media (min-width: 767px) {
+    @media (min-width: 768px) {
         .gh-article-excerpt {
             margin-top: 40px;
             font-weight: 100;

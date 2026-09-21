@@ -92,7 +92,7 @@
        brand title, but subtler amplitude and a tighter duration so menu
        interactions feel responsive rather than theatrical. Weight also
        interpolates from medium to bold on hover for a quiet emphasis. */
-    @media (min-width: 767px) {
+    @media (min-width: 768px) {
         .gh-head-menu .nav a {
             display: inline-block;
             font-weight: 500;
@@ -118,7 +118,7 @@
     }
 }
 
-@media (min-width: 767px) {
+@media (min-width: 768px) {
     .gh-head {
         position: fixed;
         z-index: 9999;
@@ -187,8 +187,15 @@
         grid-column: 3;
     }
 
+    /* Do NOT use justify-self here. It shrink-wraps the grid item to its
+       content, and shared-theme-assets' dropdown.js collapses the whole nav
+       into a "more" button while (nav.offsetWidth + 64) > menu.offsetWidth.
+       A shrink-wrapped container makes that condition permanently true, so
+       the navigation disappears at every viewport width. Stretching the item
+       and aligning its contents with justify-content gives the same visual
+       result while leaving the measurement intact. */
     .is-head-middle-logo .gh-head-inner:not(:has(.gh-head-actions)) .gh-head-menu {
-        justify-self: end;
+        justify-content: flex-end;
     }
 }
 
@@ -225,7 +232,7 @@
         }
     }
 
-    @media (min-width: 767px) {
+    @media (min-width: 768px) {
         .nav-articles:not(.gh-dropdown > .nav-about):before,
         .nav-about:not(.gh-dropdown > .nav-about):before,
         .nav-years:not(.gh-dropdown > .nav-about):before {
