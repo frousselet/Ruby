@@ -663,6 +663,30 @@ body::after {
 }
 
 
+/* Native share button (upstream #501), placed after the article body
+   since this theme no longer renders the prev/next post navigation. */
+.gh-article-share {
+    display: flex;
+    justify-content: center;
+    margin-top: 48px;
+}
+
+.gh-article-share .gh-button-share {
+    font-family: var(--font-sans);
+}
+
+@media (prefers-color-scheme: dark) {
+    .gh-button-share {
+        color: rgba(255, 255, 255, 0.85);
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .gh-button-share:hover {
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+}
+
+
 /* ---------- 11. Variable font optical sizing */
 
 html {

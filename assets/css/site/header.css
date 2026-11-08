@@ -201,7 +201,10 @@
         margin-left: 0;
         margin-right: 0;
     }
+}
 
+/* Upstream now applies the stacked layout from 768px (was 992px). */
+@media (min-width: 768px) {
     .is-head-stacked .gh-head-menu {
         justify-content: flex-end;
     }
